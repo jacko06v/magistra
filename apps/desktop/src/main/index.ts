@@ -1,7 +1,9 @@
-import { app, BrowserWindow, dialog, protocol, net, safeStorage, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, protocol, net, safeStorage, shell } from 'electron'
 import { join, normalize, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
+import { createBackendCore } from './core/backend-core'
+import { registerBackendIpc } from './ipc/backend-ipc'
 import { SecretVault, type LinuxSafeStorageWarning } from './security/secret-vault'
 
 // In sviluppo electron-vite espone l'URL del dev server (con HMR) in questa
@@ -9,6 +11,7 @@ import { SecretVault, type LinuxSafeStorageWarning } from './security/secret-vau
 const rendererDevUrl = process.env['ELECTRON_RENDERER_URL']
 const isDev = !!rendererDevUrl
 let secretVault: SecretVault | null = null
+const backendCore = createBackendCore()
 
 // Lo schema `app://` va dichiarato come privilegiato PRIMA che l'app sia pronta:
 // è standard (URL assoluti/relativi risolti come sul web), sicuro (contesto
@@ -98,6 +101,7 @@ function showLinuxSafeStorageWarning(warning: LinuxSafeStorageWarning): void {
 
 app.whenReady().then(() => {
   initializeSecretVault()
+  registerBackendIpc(ipcMain, backendCore)
 
   if (!isDev) {
     registerAppProtocol()

@@ -12,6 +12,7 @@
     "build": "electron-vite build",
     "start": "electron-vite preview",
     "package": "electron-vite build && electron-builder",
+    "test:backend": "node --experimental-strip-types --test test/backend/*.test.ts",
     "test:security": "node --experimental-strip-types --test test/security/*.test.ts",
     "typecheck:node": "tsc --noEmit --composite false -p tsconfig.node.json",
     "typecheck:web": "tsc --noEmit --composite false -p tsconfig.web.json",

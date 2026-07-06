@@ -1,10 +1,19 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
+import {
+  backendIpcChannels,
+  type BackendEchoRequest,
+  type BackendEchoResponse
+} from '@magistra/shared'
 
 // Ponte sicuro tra renderer e main. Con contextIsolation attivo, il renderer
 // non ha accesso diretto a Node/Electron: espone solo ciò che dichiariamo qui.
-// Il contratto IPC tipizzato del backend (chat, retrieval, ricerca, upload)
-// arriva nel task del core; per ora il ponte è vuoto ma già in posizione.
-const api = {}
+const api = {
+  backend: {
+    echo(request: BackendEchoRequest): Promise<BackendEchoResponse> {
+      return ipcRenderer.invoke(backendIpcChannels.echo, request) as Promise<BackendEchoResponse>
+    }
+  }
+}
 
 if (process.contextIsolated) {
   try {
