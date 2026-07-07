@@ -1,9 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import {
-  backendIpcChannels,
-  type BackendEchoRequest,
-  type BackendEchoResponse
-} from '@magistra/shared'
+import { backendIpcChannels } from '@magistra/shared/backend-channels'
+import type { BackendEchoRequest, BackendEchoResponse } from '@magistra/shared'
 
 // Ponte sicuro tra renderer e main. Con contextIsolation attivo, il renderer
 // non ha accesso diretto a Node/Electron: espone solo ciò che dichiariamo qui.

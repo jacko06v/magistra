@@ -12,6 +12,10 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./backend-channels": {
+      "types": "./src/backend-channels.ts",
+      "default": "./src/backend-channels.ts"
     }
   },
   "scripts": {

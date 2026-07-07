@@ -2,8 +2,13 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import { backendIpcChannels, type BackendCoreContract } from '@magistra/shared'
+import { backendIpcChannels as lightweightBackendIpcChannels } from '@magistra/shared/backend-channels'
 
 import { registerBackendIpc, type IpcMainLike } from '../../src/main/ipc/backend-ipc.ts'
+
+test('il subpath leggero dei canali IPC resta allineato al contratto condiviso', () => {
+  assert.deepEqual(lightweightBackendIpcChannels, backendIpcChannels)
+})
 
 class IpcMainSpy implements IpcMainLike {
   private readonly handlers = new Map<
@@ -77,4 +82,25 @@ test('l adattatore IPC rifiuta payload non validi prima di chiamare il core', as
 
   await assert.rejects(ipcMain.invoke(backendIpcChannels.echo, { messaggio: '' }))
   assert.equal(called, false)
+})
+
+test('l adattatore IPC valida anche la risposta del core', async () => {
+  const ipcMain = new IpcMainSpy()
+  registerBackendIpc(ipcMain, {
+    ...core,
+    async echo() {
+      return {
+        messaggio: 'risposta non valida',
+        ricevuto_il: 'non una data ISO',
+        lunghezza: -1
+      } as unknown as Awaited<ReturnType<BackendCoreContract['echo']>>
+    }
+  })
+
+  await assert.rejects(
+    ipcMain.invoke(backendIpcChannels.echo, {
+      messaggio: 'andata',
+      timestamp_client: '2026-07-06T00:00:00.000Z'
+    })
+  )
 })

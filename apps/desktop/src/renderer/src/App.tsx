@@ -10,7 +10,14 @@ export function App() {
   useEffect(() => {
     let isMounted = true
 
-    window.magistra.backend
+    const backend = window.magistra?.backend
+
+    if (!backend) {
+      setBackendStatus('Backend locale non raggiungibile')
+      return
+    }
+
+    backend
       .echo({
         messaggio: 'IPC pronto',
         timestamp_client: new Date().toISOString()
